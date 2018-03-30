@@ -1,9 +1,10 @@
 (function () {
   initMobileMenu()
+  initVideoModal()
   if (PAGE_TYPE) {
     initVersionSelect()
-    initSubHeaders()
     initApiSpecLinks()
+    initSubHeaders()
     initLocationHashFuzzyMatching()
   }
 
@@ -12,14 +13,22 @@
     if (apiContent) {
       var apiTitles = [].slice.call(apiContent.querySelectorAll('h3'))
       apiTitles.forEach(function (titleNode) {
+        var methodMatch = titleNode.textContent.match(/^([^(]+)\(/)
+        if (methodMatch) {
+          var idWithoutArguments = slugize(methodMatch[1])
+          titleNode.setAttribute('id', idWithoutArguments)
+          titleNode.querySelector('a').setAttribute('href', '#' + idWithoutArguments)
+        }
+
         var ulNode = titleNode.parentNode.nextSibling
         if (ulNode.tagName !== 'UL') {
           ulNode = ulNode.nextSibling
+          if (!ulNode) return
         }
         if (ulNode.tagName === 'UL') {
           var specNode = document.createElement('li')
           var specLink = createSourceSearchPath(titleNode.textContent)
-          specNode.innerHTML = '<a href="' + specLink + '" target="_blank">Source</a>'
+          specNode.innerHTML = '<a href="' + specLink + '" target="_blank">源代码</a>'
           ulNode.appendChild(specNode)
         }
       })
@@ -40,7 +49,7 @@
       hash = hash.substr(1)
     }
 
-    // Escape characthers
+    // Escape characters
     try {
       hash = decodeURIComponent(hash)
     } catch (e) {}
@@ -55,9 +64,7 @@
     if (!hashTarget) {
       var normalizedHash = normalizeHash(hash)
       var possibleHashes = [].slice.call(document.querySelectorAll('[id]'))
-        .map(function (el) {
-          return el.id
-        })
+        .map(function (el) { return el.id })
       possibleHashes.sort(function (hashA, hashB) {
         var distanceA = levenshteinDistance(normalizedHash, normalizeHash(hashA))
         var distanceB = levenshteinDistance(normalizedHash, normalizeHash(hashB))
@@ -134,6 +141,42 @@
   }
 
   /**
+  * Modal Video Player
+  */
+  function initVideoModal () {
+    var modalButton = document.getElementById('modal-player')
+    var videoModal = document.getElementById('video-modal')
+
+    if (!modalButton || !videoModal) {
+      return
+    }
+
+    var videoWrapper = videoModal.querySelector('.video-space')
+    var overlay = document.createElement('div')
+        overlay.className = 'overlay'
+    var isOpen = false
+
+    modalButton.addEventListener('click', function(event) {
+      event.stopPropagation()
+      videoModal.classList.toggle('open')
+      document.body.classList.toggle('stop-scroll')
+      document.body.appendChild(overlay)
+      videoWrapper.innerHTML = '<iframe style="height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="//player.youku.com/embed/XMzMwMTYyODMyNA==" frameborder="0" allowfullscreen></iframe>'
+      isOpen = true
+    })
+
+    document.body.addEventListener('click', function(e) {
+      if (isOpen && e.target !== modalButton && !videoModal.contains(e.target)) {
+        videoModal.classList.remove('open')
+        document.body.classList.remove('stop-scroll')
+        document.body.removeChild(overlay)
+        player.unload()
+        isOpen = false
+      }
+    })
+  }
+
+  /**
    * Doc version select
    */
 
@@ -145,7 +188,7 @@
       var section = window.location.pathname.match(/\/v\d\/(\w+?)\//)[1]
       if (version === 'SELF') return
       window.location.assign(
-        'http://' +
+        'https://' +
         version +
         (version && '-') +
         'cn.vuejs.org/' + section + '/'
@@ -166,11 +209,15 @@
 
     // build sidebar
     var currentPageAnchor = sidebar.querySelector('.sidebar-link.current')
-    var isAPI = document.querySelector('.content').classList.contains('api')
-    if (currentPageAnchor || isAPI) {
+    var contentClasses = document.querySelector('.content').classList
+    var isAPIOrStyleGuide = (
+      contentClasses.contains('api') ||
+      contentClasses.contains('style-guide')
+    )
+    if (currentPageAnchor || isAPIOrStyleGuide) {
       var allHeaders = []
       var sectionContainer
-      if (isAPI) {
+      if (isAPIOrStyleGuide) {
         sectionContainer = document.querySelector('.menu-root')
       } else {
         sectionContainer = document.createElement('ul')
@@ -185,12 +232,13 @@
           allHeaders.push(h)
           allHeaders.push.apply(allHeaders, h3s)
           if (h3s.length) {
-            sectionContainer.appendChild(makeSubLinks(h3s, isAPI))
+            sectionContainer.appendChild(makeSubLinks(h3s, isAPIOrStyleGuide))
           }
         })
       } else {
         headers = content.querySelectorAll('h3')
         each.call(headers, function (h) {
+          console.log(h)
           sectionContainer.appendChild(makeLink(h))
           allHeaders.push(h)
         })
@@ -198,6 +246,10 @@
 
       var animating = false
       sectionContainer.addEventListener('click', function (e) {
+
+        // Not prevent hashchange for smooth-scroll
+        // e.preventDefault()
+
         if (e.target.classList.contains('section-link')) {
           sidebar.classList.remove('open')
           setActive(e.target)
@@ -243,9 +295,8 @@
           last = link
         }
       }
-      if (last) {
+      if (last)
         setActive(last.id, !hoveredOverSidebar)
-      }
     }
 
     function makeLink (h) {
@@ -301,16 +352,16 @@
 
     function setActive (id, shouldScrollIntoView) {
       var previousActive = sidebar.querySelector('.section-link.active')
-      var currentActive = typeof id === 'string' ?
-        sidebar.querySelector('.section-link[href="#' + id + '"]') :
-        id
+      var currentActive = typeof id === 'string'
+        ? sidebar.querySelector('.section-link[href="#' + id + '"]')
+        : id
       if (currentActive !== previousActive) {
         if (previousActive) previousActive.classList.remove('active')
         currentActive.classList.add('active')
         if (shouldScrollIntoView) {
-          var currentPageOffset = currentPageAnchor ?
-            currentPageAnchor.offsetTop - 8 :
-            0
+          var currentPageOffset = currentPageAnchor
+            ? currentPageAnchor.offsetTop - 8
+            : 0
           var currentActiveOffset = currentActive.offsetTop + currentActive.parentNode.clientHeight
           var sidebarHeight = sidebar.clientHeight
           var currentActiveIsInView = (
@@ -318,22 +369,68 @@
             currentActiveOffset <= sidebar.scrollTop + sidebarHeight
           )
           var linkNotFurtherThanSidebarHeight = currentActiveOffset - currentPageOffset < sidebarHeight
-          var newScrollTop = currentActiveIsInView ?
-            sidebar.scrollTop :
-            linkNotFurtherThanSidebarHeight ?
-            currentPageOffset :
-            currentActiveOffset - sidebarHeight
+          var newScrollTop = currentActiveIsInView
+            ? sidebar.scrollTop
+            : linkNotFurtherThanSidebarHeight
+              ? currentPageOffset
+              : currentActiveOffset - sidebarHeight
           sidebar.scrollTop = newScrollTop
         }
       }
     }
 
-    function makeHeaderClickable (link) {
-      var wrapper = document.createElement('a')
-      wrapper.href = '#' + link.id
-      wrapper.setAttribute('data-scroll', '')
-      link.parentNode.insertBefore(wrapper, link)
-      wrapper.appendChild(link)
+    function makeHeaderClickable (header) {
+      var link = header.querySelector('a')
+      link.setAttribute('data-scroll', '')
+
+      // transform DOM structure from
+      // `<h2><a></a>Header</a>` to <h2><a>Header</a></h2>`
+      // to make the header clickable
+      var nodes = Array.prototype.slice.call(header.childNodes)
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i]
+        if (node !== link) {
+          link.appendChild(node)
+        }
+      }
+    }
+  }
+
+  // Stolen from: https://github.com/hexojs/hexo-util/blob/master/lib/escape_regexp.js
+  function escapeRegExp(str) {
+    if (typeof str !== 'string') throw new TypeError('str must be a string!');
+
+    // http://stackoverflow.com/a/6969486
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+  }
+
+  // Stolen from: https://github.com/hexojs/hexo-util/blob/master/lib/slugize.js
+  function slugize(str, options) {
+    if (typeof str !== 'string') throw new TypeError('str must be a string!')
+    options = options || {}
+
+    var rControl = /[\u0000-\u001f]/g
+    var rSpecial = /[\s~`!@#\$%\^&\*\(\)\-_\+=\[\]\{\}\|\\;:"'<>,\.\?\/]+/g
+    var separator = options.separator || '-'
+    var escapedSep = escapeRegExp(separator)
+
+    var result = str
+      // Remove control characters
+      .replace(rControl, '')
+      // Replace special characters
+      .replace(rSpecial, separator)
+      // Remove continous separators
+      .replace(new RegExp(escapedSep + '{2,}', 'g'), separator)
+      // Remove prefixing and trailing separtors
+      .replace(new RegExp('^' + escapedSep + '+|' + escapedSep + '+$', 'g'), '')
+
+    switch (options.transform) {
+      case 1:
+        return result.toLowerCase()
+      case 2:
+        return result.toUpperCase()
+      default:
+        return result
     }
   }
 })()

@@ -2,20 +2,23 @@
 title: 安装
 type: guide
 order: 1
-vue_version: 2.4.0
-dev_size: "257.91"
-min_size: "79.71"
-gz_size: "28.96"
-ro_gz_size: "20.18"
+vue_version: 2.5.13
+gz_size: "30.67"
 ---
 
 ### 兼容性
 
-Vue.js **不支持** IE8 及其以下版本，因为 Vue.js 使用的 ECMAScript 5 特性在 IE8 无法模拟。Vue.js 支持所有[兼容 ECMAScript 5 的浏览器](http://caniuse.com/#feat=es5)。
+Vue.js **不支持** IE8 及其以下版本，因为 Vue.js 使用的 ECMAScript 5 特性在 IE8 无法模拟。Vue.js 支持所有[兼容 ECMAScript 5 的浏览器](https://caniuse.com/#feat=es5)。
 
 ### 更新日志
 
+最新稳定版本：{{vue_version}}
+
 每个版本的详细更新日志见 [GitHub](https://github.com/vuejs/vue/releases)。
+
+## Vue Devtools
+
+在使用 Vue 时，我们推荐你在浏览器中安装 [Vue Devtools](https://github.com/vuejs/vue-devtools#vue-devtools) ，可以通过更加友好的用户界面，来审查和调试你的 Vue 应用程序。
 
 ## 直接引入 `<script>` 标签
 
@@ -26,14 +29,23 @@ Vue.js **不支持** IE8 及其以下版本，因为 Vue.js 使用的 ECMAScript
 <div id="downloads">
 <a class="button" href="http://vuejs.org/js/vue.js" download>开发环境版本</a><span class="light info">包含完整的警告和调试模式</span>
 
-<a class="button" href="http://vuejs.org/js/vue.min.js" download>生产环境版本</a><span class="light info">删除警告，{{gz_size}}kb min+gzip</span>
+<a class="button" href="http://vuejs.org/js/vue.min.js" download>生产环境版本</a><span class="light info">删除警告，{{gz_size}}KB min+gzip</span>
 </div>
 
 ### CDN
 
-推荐使用：[https://unpkg.com/vue](https://unpkg.com/vue)，在 npm 发布后，立刻就能够展现最新版本。你还可以在 [https://unpkg.com/vue/](https://unpkg.com/vue/) 浏览 npm 包的源码。
+我们比较推荐的方式是，链接到可以手动修改的指定版本上：
 
-还可以使用 [jsDelivr](//cdn.jsdelivr.net/vue/latest/vue.js) 或 [cdnjs](//cdnjs.cloudflare.com/ajax/libs/vue/{{vue_version}}/vue.js)，但是这两个服务需要一段时间才能同步，所以可能会无法获取最新版本。
+``` html
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+```
+
+你可以在 [cdn.jsdelivr.net/npm/vue](https://cdn.jsdelivr.net/npm/vue/) 浏览 npm 包的源码。
+
+还可以使用 [unpkg](https://unpkg.com/vue@{{vue_version}}/dist/vue.js) 和 [cdnjs](https://cdnjs.cloudflare.com/ajax/libs/vue/{{vue_version}}/vue.js) 来获取 Vue（cdnjs 需要一段时间才能同步，所以可能会无法获取最新版本）。
+
+请务必阅读 [Vue 不同构建版本的解释说明](#%E4%B8%8D%E5%90%8C%E6%9E%84%E5%BB%BA%E7%89%88%E6%9C%AC%E7%9A%84%E8%A7%A3%E9%87%8A%E8%AF%B4%E6%98%8E)，并且在你发布的网站中使用**生产环境版本**，也就是将 `vue.js` 替换为 `vue.min.js`。
+这是一个为了更快速的执行，而进行更小体积优化的构建版本，并不是为了好的开发体验。
 
 ## NPM
 
@@ -55,7 +67,6 @@ $ npm install --global vue-cli
 $ vue init webpack my-project
 # 安装依赖，然后开始！
 $ cd my-project
-$ npm install
 $ npm run dev
 ```
 
@@ -63,7 +74,7 @@ $ npm run dev
 
 ## 不同构建版本的解释说明
 
-在 [NPM 包的 `dist/` 目录下](https://unpkg.com/vue@latest/dist/)，你会找到许多不同构建版本的 Vue.js。以下是它们之间差异的概述：
+在 [NPM 包的 `dist/` 目录下](https://cdn.jsdelivr.net/npm/vue/dist/)，你会找到许多不同构建版本的 Vue.js。以下是它们之间差异的概述：
 
 | | UMD | CommonJS | ES Module |
 | --- | --- | --- | --- |
@@ -80,15 +91,15 @@ $ npm run dev
 
 - **运行时(Runtime)**：负责创建 Vue 实例(creating Vue instances)、渲染(rendering)和修补虚拟 DOM(patching virtual DOM) 等的代码。基本上，等同于完整版本减去编译器。
 
-- **[UMD](https://github.com/umdjs/umd)**：UMD 构建版本能够直接在浏览器中通过 `<script>` 标签使用。Unpkg CDN 提供的默认文件 [https://unpkg.com/vue](https://unpkg.com/vue)，是运行时+编译器(Runtime + Compiler)的 UMD 构建版本。
+- **[UMD](https://github.com/umdjs/umd)**：UMD 构建版本能够直接在浏览器中通过 `<script>` 标签使用。jsDelivr CDN 提供的默认文件 [https://cdn.jsdelivr.net/npm/vue](https://cdn.jsdelivr.net/npm/vue)，是运行时+编译器(Runtime + Compiler)的 UMD 构建版本（`vue.js`）。
 
 - **[CommonJS](http://wiki.commonjs.org/wiki/Modules/1.1)**：CommonJS 版本用于较早期的打包器(bundler)（例如 [browserify](http://browserify.org/) 或 [webpack 1](https://webpack.github.io) 等）中。用于这些打包器的默认文件(`pkg.main`)，是只含有运行时(Runtime only)的 CommonJS 构建版本(`vue.runtime.common.js`)。
 
-- **[ES Module](http://exploringjs.com/es6/ch_modules.html)**：ES 模块版本构建用于现代打包器（例如 [webpack 2](https://webpack.js.org) 或 [rollup](http://rollupjs.org/) 等）中。用于这些打包器的默认文件(`pkg.module`)，是只含有运行时(Runtime only)的 ES Module 构建版本(`vue.runtime.esm.js`)。
+- **[ES Module](http://exploringjs.com/es6/ch_modules.html)**：ES 模块版本构建用于现代打包器（例如 [webpack 2](https://webpack.js.org) 或 [rollup](https://rollupjs.org/) 等）中。用于这些打包器的默认文件(`pkg.module`)，是只含有运行时(Runtime only)的 ES Module 构建版本(`vue.runtime.esm.js`)。
 
 ### 运行时+编译器(Runtime + Compiler)版本 vs 只含有运行时版本(Runtime-only)
 
-如果你需要即时编译模板（例如，向 `template` 选项传入一个字符串，或者需要将模板中的非 DOM 的 HTML 挂载到一个元素），你需要带有编译器的版本，因而需要完整构建版本。
+如果你需要在客户端编译模板（例如，向 `template` 选项传入一个字符串，或者需要将模板中的非 DOM 的 HTML 挂载到一个元素），你需要带有编译器的版本，因而需要完整构建版本。
 
 ``` js
 // 这种情况需要编译器(compiler)
@@ -108,7 +119,7 @@ new Vue({
 
 由于只含有运行时构建版本(runtime-only)比完整构建版本(full-build)轻量大约 30%，你应该尽可能使用只含有运行时的构建版本。如果你还是希望使用完整构建版本，则需要在打包器中配置别名：
 
-由于运行时版本的构建比其全面版本的重量轻约30％，因此您可以随时使用它。如果您仍然希望使用完整版本，则需要在捆绑程序中配置别名：
+由于运行时版本的构建比其全面版本的重量轻约30％，因此你可以随时使用它。如果你仍然希望使用完整版本，则需要在捆绑程序中配置别名：
 
 #### webpack
 

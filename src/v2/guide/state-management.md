@@ -1,7 +1,7 @@
 ---
 title: 状态管理
 type: guide
-order: 22
+order: 502
 ---
 
 ## 类 Flux 状态管理的官方实现
@@ -10,7 +10,7 @@ order: 22
 
 ### React 的开发者请参考以下信息
 
-如果你是来自 React 的开发者，你可能会对 vuex 和 [redux](https://github.com/reactjs/redux) 间的差异表示关注，redux 是 React 生态环境中最流行的 Flux 实现。Redux 事实上无法感知视图层，所以它能够轻松的通过一些[简单绑定](https://github.com/egoist/revue)和Vue一起使用。vuex区别在于它是一个专门为 vue 应用所设计。这使得它能够更好地和vue进行整合，同时提供简洁的API和改善过的开发体验。
+如果你是来自 React 的开发者，你可能会对 vuex 和 [redux](https://github.com/reactjs/redux) 间的差异表示关注，redux 是 React 生态环境中最流行的 Flux 实现。Redux 事实上无法感知视图层，所以它能够轻松的通过一些[简单绑定](https://yarnpkg.com/en/packages?q=redux%20vue&p=1)和Vue一起使用。vuex区别在于它是一个专门为 vue 应用所设计。这使得它能够更好地和vue进行整合，同时提供简洁的API和改善过的开发体验。
 
 ## 简单状态管理起步使用
 
@@ -30,7 +30,7 @@ const vmB = new Vue({
 
 现在当 `sourceOfTruth` 发生变化，`vmA` 和 `vmB` 都将自动的更新引用它们的视图。子组件们的每个实例也会通过 `this.$root.$data` 去访问。现在我们有了唯一的实际来源，但是，调试将会变为噩梦。任何时间，我们应用中的任何部分，在任何数据改变后，都不会留下变更过的记录。
 
-为了解决这个问题，我们采用一个简单的 **store 模式**：
+为了解决这个问题，我们采用一个 **store 模式**：
 
 ``` js
 var store = {
@@ -73,12 +73,12 @@ var vmB = new Vue({
 
 <p class="tip">重要的是，注意你不应该在 action 中 替换原始的状态对象 - 组件和 store 需要引用同一个共享对象，mutation 才能够被观察</p>
 
-接着我们继续延伸约定，组件不允许直接修改属于 store 实例的 state，而应执行 action 来分发 (dispatch) 事件通知 store 去改变，我们最终达成了 [Flux](https://facebook.github.io/flux/) 架构。这样约定的好处是，我们能够记录所有 store 中发生的 state 改变，同时实现能做到记录变更 (mutation) 、保存状态快照、历史回滚/时光旅行的先进的调试工具。
+接着我们继续延伸约定，组件不允许直接修改属于 store 实例的 state，而应执行 action 来分发(dispatch)事件通知 store 去改变，我们最终达成了 [Flux](https://facebook.github.io/flux/) 架构。这样约定的好处是，我们能够记录所有 store 中发生的 state 改变，同时实现能做到记录变更 (mutation) 、保存状态快照、历史回滚/时光旅行的先进的调试工具。
 
-说了一圈其实又回到了[vuex](https://github.com/vuejs/vuex) ，如果你已经读到这儿，或许可以去尝试一下！
+说了一圈其实又回到了 [vuex](https://github.com/vuejs/vuex) ，如果你已经读到这儿，或许可以去尝试一下！
 
 ***
 
-> 原文： http://vuejs.org/guide/state-management.html
+> 原文：https://vuejs.org/v2/guide/state-management.html
 
 ***

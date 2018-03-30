@@ -4,11 +4,9 @@ type: guide
 order: 8
 ---
 
-## `v-for`
+## 使用 `v-for` 遍历数组生成元素
 
 我们可以使用 `v-for` 指令，将一个数组渲染为列表项。`v-for` 指令需要限定格式为 `item in items` 的特殊语法，其中，`items` 是原始数据数组(source data array)，而 `item` 是数组中每个迭代元素的**指代别名(alias)**：
-
-### 基本用法
 
 ``` html
 <ul id="example-1">
@@ -112,25 +110,12 @@ var example2 = new Vue({
 <div v-for="item of items"></div>
 ```
 
-### 在 template 元素上使用 `v-for`
-
-类似模板中的 `v-if`，你还可以对 `<template>` 标签使用 `v-for`，来渲染多个元素块。例如：
-
-``` html
-<ul>
-  <template v-for="item in items">
-    <li>{{ item.msg }}</li>
-    <li class="divider"></li>
-  </template>
-</ul>
-```
-
-### 使用 `v-for` 遍历对象
+## 使用 `v-for` 遍历对象
 
 也可以使用 `v-for` 来遍历对象的属性。
 
 ``` html
-<ul id="repeat-object" class="demo">
+<ul id="v-for-object" class="demo">
   <li v-for="value in object">
     {{ value }}
   </li>
@@ -139,7 +124,7 @@ var example2 = new Vue({
 
 ``` js
 new Vue({
-  el: '#repeat-object',
+  el: '#v-for-object',
   data: {
     object: {
       firstName: 'John',
@@ -153,14 +138,14 @@ new Vue({
 结果：
 
 {% raw %}
-<ul id="repeat-object" class="demo">
+<ul id="v-for-object" class="demo">
   <li v-for="value in object">
     {{ value }}
   </li>
 </ul>
 <script>
 new Vue({
-  el: '#repeat-object',
+  el: '#v-for-object',
   data: {
     object: {
       firstName: 'John',
@@ -176,189 +161,63 @@ new Vue({
 
 ``` html
 <div v-for="(value, key) in object">
-  {{ key }} : {{ value }}
+  {{ key }}: {{ value }}
 </div>
 ```
+
+{% raw %}
+<div id="v-for-object-value-key" class="demo">
+  <div v-for="(value, key) in object">
+    {{ key }}: {{ value }}
+  </div>
+</div>
+<script>
+new Vue({
+  el: '#v-for-object-value-key',
+  data: {
+    object: {
+      firstName: 'John',
+      lastName: 'Doe',
+      age: 30
+    }
+  }
+})
+</script>
+{% endraw %}
 
 然后第三个参数作为索引(index)：
 
 ``` html
 <div v-for="(value, key, index) in object">
-  {{ index }}. {{ key }} : {{ value }}
+  {{ index }}. {{ key }}: {{ value }}
 </div>
 ```
+
+{% raw %}
+<div id="v-for-object-value-key-index" class="demo">
+  <div v-for="(value, key, index) in object">
+    {{ index }}. {{ key }}: {{ value }}
+  </div>
+</div>
+<script>
+new Vue({
+  el: '#v-for-object-value-key-index',
+  data: {
+    object: {
+      firstName: 'John',
+      lastName: 'Doe',
+      age: 30
+    }
+  }
+})
+</script>
+{% endraw %}
 
 <p class="tip">在遍历一个对象时，是按照 `Object.keys()` 得出 key 的枚举顺序来遍历，**无法**保证在所有 JavaScript 引擎实现中完全一致。</p>
 
-### 使用 `v-for` 在整数值范围内迭代
-
-`v-for` 也可以在整数值范围内迭代。在这种情况下，会将模板重复多次。
-
-``` html
-<div>
-  <span v-for="n in 10">{{ n }}</span>
-</div>
-```
-
-结果：
-
-{% raw %}
-<div id="range" class="demo">
-  <span v-for="n in 10">{{ n }} </span>
-</div>
-<script>
-new Vue({ el: '#range' })
-</script>
-{% endraw %}
-
-### 组件与 `v-for`
-
-> 此节假定已具备[组件](components.html)相关知识。可以先跳过本节内容，了解组件后再回来。
-
-在自定义组件上，你可以直接使用 `v-for`，就像其他普通元素：
-
-``` html
-<my-component v-for="item in items" :key="item.id"></my-component>
-```
-
-> 现在，在 2.2.0+ 版本，当对组件使用 `v-for` 时，必须设置 [`key`](list.html#key) 属性。
-
-然而，这里无法自动向组件中传入数据，这是因为组件有自己的独立作用域。为了将组件外部的迭代数据传入组件，我们还需要额外使用 props：
-
-``` html
-<my-component
-  v-for="(item, index) in items"
-  v-bind:item="item"
-  v-bind:index="index"
-  v-bind:key="item.id">
-</my-component>
-```
-
-没有通过 v-for 将 `item` 自动注入到组件中的原因是，一旦自动注入，就会使得组件与 `v-for` 指令的运行方式紧密耦合(tightly coupled)在一起。通过显式声明组件数据来源，可以使得组件可重用于其他场景。
-
-这里是一个 todo list 的完整示例：
-
-``` html
-<div id="todo-list-example">
-  <input
-    v-model="newTodoText"
-    v-on:keyup.enter="addNewTodo"
-    placeholder="Add a todo"
-  >
-  <ul>
-    <li
-      is="todo-item"
-      v-for="(todo, index) in todos"
-      v-bind:key="index"
-      v-bind:title="todo"
-      v-on:remove="todos.splice(index, 1)"
-    ></li>
-  </ul>
-</div>
-```
-
-``` js
-Vue.component('todo-item', {
-  template: '\
-    <li>\
-      {{ title }}\
-      <button v-on:click="$emit(\'remove\')">X</button>\
-    </li>\
-  ',
-  props: ['title']
-})
-
-new Vue({
-  el: '#todo-list-example',
-  data: {
-    newTodoText: '',
-    todos: [
-      'Do the dishes',
-      'Take out the trash',
-      'Mow the lawn'
-    ]
-  },
-  methods: {
-    addNewTodo: function () {
-      this.todos.push(this.newTodoText)
-      this.newTodoText = ''
-    }
-  }
-})
-```
-
-{% raw %}
-<div id="todo-list-example" class="demo">
-  <input
-    v-model="newTodoText"
-    v-on:keyup.enter="addNewTodo"
-    placeholder="Add a todo"
-  >
-  <ul>
-    <li
-      is="todo-item"
-      v-for="(todo, index) in todos"
-      v-bind:key="index"
-      v-bind:title="todo"
-      v-on:remove="todos.splice(index, 1)"
-    ></li>
-  </ul>
-</div>
-<script>
-Vue.component('todo-item', {
-  template: '\
-    <li>\
-      {{ title }}\
-      <button v-on:click="$emit(\'remove\')">X</button>\
-    </li>\
-  ',
-  props: ['title']
-})
-new Vue({
-  el: '#todo-list-example',
-  data: {
-    newTodoText: '',
-    todos: [
-      'Do the dishes',
-      'Take out the trash',
-      'Mow the lawn'
-    ]
-  },
-  methods: {
-    addNewTodo: function () {
-      this.todos.push(this.newTodoText)
-      this.newTodoText = ''
-    }
-  }
-})
-</script>
-{% endraw %}
-
-### 带有 `v-if` 的 `v-for`
-
-当它们都处于同一节点时，`v-for` 的优先级高于 `v-if`。这意味着，`v-if` 将分别在循环中的每次迭代上运行。当你只想将_某些_项渲染为节点时，这会非常有用，如下：
-
-``` html
-<li v-for="todo in todos" v-if="!todo.isComplete">
-  {{ todo }}
-</li>
-```
-
-以上只渲染 todos 中未完成的项。
-
-如果你的意图与此相反，是根据条件跳过执行循环，可以将 `v-if` 放置于包裹元素上（或放置于 [`<template>`](conditional.html#Conditional-Groups-with-v-if-on-lt-template-gt) 上）。例如：
-
-``` html
-<ul v-if="shouldRenderTodos">
-  <li v-for="todo in todos">
-    {{ todo }}
-  </li>
-</ul>
-```
-
 ## `key`
 
-当 Vue 更新已使用 `v-for` 渲染的元素列表时，默认会采用“就地填充”策略。如果数据项的顺序发生了变化，不是移动 DOM 元素来匹配列表项的顺序，Vue 会直接将每个元素填充到恰当的位置，并且确保最终反映为，在该特定索引处放置应该呈现的内容。这与 Vue 1.x 中的 `track-by="$index"` 的行为类似。
+当 Vue 更新已使用 `v-for` 渲染的元素列表时，默认会采用“就地填充”策略。如果数据项的顺序发生了变化，不是移动 DOM 元素来匹配列表项的顺序，Vue 会将每个元素填充到恰当的位置，并且确保最终反映为，在该特定索引处放置应该呈现的内容。这与 Vue 1.x 中的 `track-by="$index"` 的行为类似。
 
 这个默认模式是高效率的，但是只适用于**当你的列表渲染输出，不依赖于子组件状态或临时 DOM 状态（例如，表单输入值）时**。
 
@@ -366,7 +225,7 @@ new Vue({
 
 ``` html
 <div v-for="item in items" :key="item.id">
-  <!-- 内容 -->
+  <!-- content -->
 </div>
 ```
 
@@ -392,7 +251,7 @@ Vue 将观察数组(observed array)的变化数组方法(mutation method)包裹�
 
 ### 替换一个数组(Replacing an Array)
 
-变化数组方法(mutation method)，顾名思义，在调用后会改变原始数组。相比之下，还有非变化数组方法(non-mutating method)，例如 `filter()`, `concat()` 和 `slice()`，这些方法都不会直接修改操作原始数组，而是**返回一个新数组**。当使用非变化数组方法时，可以直接将旧数组替换为新数组：
+变化数组方法(mutation method)，顾名思义，在调用后会改变原始数组。相比之下，还有非变化数组方法(non-mutating method)，例如 `filter()`, `concat()` 和 `slice()`，这些方法都不会直接修改操作原始数组，而是**返回一个新数组**。当使用非变化数组方法时，可以将旧数组替换为新数组：
 
 ``` js
 example1.items = example1.items.filter(function (item) {
@@ -409,21 +268,97 @@ example1.items = example1.items.filter(function (item) {
 1. 当你使用索引直接设置一项时，例如 `vm.items[indexOfItem] = newValue`
 2. 当你修改数组长度时，例如 `vm.items.length = newLength`
 
+例如：
+
+``` js
+var vm = new Vue({
+  data: {
+    items: ['a', 'b', 'c']
+  }
+})
+vm.items[1] = 'x' // 不是响应的
+vm.items.length = 2 // 不是响应的
+```
+
 为了解决第 1 个问题，以下两种方式都可以实现与 `vm.items[indexOfItem] = newValue` 相同的效果，但是却可以通过响应式系统出发状态更新：
 
 ``` js
 // Vue.set
-Vue.set(example1.items, indexOfItem, newValue)
+Vue.set(vm.items, indexOfItem, newValue)
 ```
 ``` js
 // Array.prototype.splice
-example1.items.splice(indexOfItem, 1, newValue)
+vm.items.splice(indexOfItem, 1, newValue)
+```
+
+你还可以使用 [`vm.$set`](https://vuejs.org/v2/api/#vm-set) 实例方法，这也是全局 `Vue.set` 方法的别名：
+
+``` js
+vm.$set(vm.items, indexOfItem, newValue)
 ```
 
 为了解决第 2 个问题，你可以使用 `splice`：
 
 ``` js
-example1.items.splice(newLength)
+vm.items.splice(newLength)
+```
+
+## 对象变化检测说明(Object Change Detection Caveats)
+
+再次申明，受现代 Javascript 的限制，** Vue 无法检测到对象属性的添加或删除**。例如：
+
+``` js
+var vm = new Vue({
+  data: {
+    a: 1
+  }
+})
+// `vm.a` 是响应的
+
+vm.b = 2
+// `vm.b` 不是响应的
+```
+
+Vue 不允许在已经创建的实例上，动态地添加新的根级响应式属性(root-level reactive property)。然而，可以使用 `Vue.set(object, key, value)` 方法，将响应式属性添加到嵌套的对象上。例如，给出：
+
+``` js
+var vm = new Vue({
+  data: {
+    userProfile: {
+      name: 'Anika'
+    }
+  }
+})
+```
+
+可以向嵌套的 `userProfile` 对象，添加一个新的 `age` 属性：
+
+``` js
+Vue.set(vm.userProfile, 'age', 27)
+```
+
+还可以使用 `vm.$set` 实例方法，这也是全局 `Vue.set` 方法的别名：
+
+``` js
+vm.$set(vm.userProfile, 'age', 27)
+```
+
+有时，你想要向已经存在的对象上添加一些新的属性，例如使用  `Object.assign()`  或 `_.extend()` 方法。在这种情况下，应该创建一个新的对象，这个对象同时具有两个对象的所有属性，因此，改为：
+
+``` js
+Object.assign(vm.userProfile, {
+  age: 27,
+  favoriteColor: 'Vue Green'
+})
+```
+
+可以通过如下方式，添加新的响应式属性：
+
+``` js
+vm.userProfile = Object.assign({}, vm.userProfile, {
+  age: 27,
+  favoriteColor: 'Vue Green'
+})
 ```
 
 ## 显示过滤/排序结果(Displaying Filtered/Sorted Results)
@@ -467,6 +402,215 @@ methods: {
   }
 }
 ```
+
+## 使用 `v-for` 在整数值范围内迭代
+
+`v-for` 也可以在整数值范围内迭代。在这种情况下，会将模板重复多次。
+
+``` html
+<div>
+  <span v-for="n in 10">{{ n }}</span>
+</div>
+```
+
+结果：
+
+{% raw %}
+<div id="range" class="demo">
+  <span v-for="n in 10">{{ n }} </span>
+</div>
+<script>
+  new Vue({ el: '#range' })
+</script>
+{% endraw %}
+
+## 在 `<template>` 上使用 `v-for`
+
+类似于在 `<template>` 上使用 `v-if`，你还可以在 `<template>` 标签上使用 `v-for`，来渲染多个元素块。例如：
+
+``` html
+<ul>
+  <template v-for="item in items">
+    <li>{{ item.msg }}</li>
+    <li class="divider"></li>
+  </template>
+</ul>
+```
+
+## 带有 `v-if` 的 `v-for`
+
+当它们都处于同一节点时，`v-for` 的优先级高于 `v-if`。这意味着，`v-if` 将分别在循环中的每次迭代上运行。当你只想将_某些_项渲染为节点时，这会非常有用，如下：
+
+``` html
+<li v-for="todo in todos" v-if="!todo.isComplete">
+  {{ todo }}
+</li>
+```
+
+以上只渲染 todos 中未完成的项。
+
+如果你的意图与此相反，是根据条件跳过执行循环，可以将 `v-if` 放置于包裹元素上（或放置于 [`<template>`](conditional.html#Conditional-Groups-with-v-if-on-lt-template-gt) 上）。例如：
+
+``` html
+<ul v-if="todos.length">
+  <li v-for="todo in todos">
+    {{ todo }}
+  </li>
+</ul>
+<p v-else>No todos left!</p>
+```
+
+## 使用 `v-for` 遍历组件
+
+> 此节假定已具备[组件](components.html)相关知识。可以先跳过本节内容，了解组件后再回来。
+
+在自定义组件上，你可以直接使用 `v-for`，就像其他普通元素：
+
+``` html
+<my-component v-for="item in items" :key="item.id"></my-component>
+```
+
+> 现在，在 2.2.0+ 版本，当对组件使用 `v-for` 时，必须设置 [`key`](list.html#key) 属性。
+
+然而，这里无法自动向组件中传入数据，这是因为组件有自己的独立作用域。为了将组件外部的迭代数据传入组件，我们还需要额外使用 props：
+
+``` html
+<my-component
+  v-for="(item, index) in items"
+  v-bind:item="item"
+  v-bind:index="index"
+  v-bind:key="item.id"
+></my-component>
+```
+
+没有通过 v-for 将 `item` 自动注入到组件中的原因是，一旦自动注入，就会使得组件与 `v-for` 指令的运行方式紧密耦合(tightly coupled)在一起。通过显式声明组件数据来源，可以使得组件可重用于其他场景。
+
+这里是一个 todo list 的完整示例：
+
+``` html
+<div id="todo-list-example">
+  <input
+    v-model="newTodoText"
+    v-on:keyup.enter="addNewTodo"
+    placeholder="Add a todo"
+  >
+  <ul>
+    <li
+      is="todo-item"
+      v-for="(todo, index) in todos"
+      v-bind:key="todo.id"
+      v-bind:title="todo.title"
+      v-on:remove="todos.splice(index, 1)"
+    ></li>
+  </ul>
+</div>
+```
+
+<p class="tip">注意 `is="todo-item"` 属性。这在 DOM 模板中是必需的，因为在 `<ul>` 中，只有 `<li>` 是有效元素。这与调用 `<todo-item>` 的实际结果相同，但是却可以解决浏览器潜在的解析错误。了解更多信息，请查看 [DOM 模板解析注意事项](components.html#components.html#DOM-模板解析注意事项)。</p>
+
+``` js
+Vue.component('todo-item', {
+  template: '\
+    <li>\
+      {{ title }}\
+      <button v-on:click="$emit(\'remove\')">X</button>\
+    </li>\
+  ',
+  props: ['title']
+})
+
+new Vue({
+  el: '#todo-list-example',
+  data: {
+    newTodoText: '',
+    todos: [
+      {
+        id: 1,
+        title: 'Do the dishes',
+      },
+      {
+        id: 2,
+        title: 'Take out the trash',
+      },
+      {
+        id: 3,
+        title: 'Mow the lawn'
+      }
+    ],
+    nextTodoId: 4
+  },
+  methods: {
+    addNewTodo: function () {
+      this.todos.push({
+        id: this.nextTodoId++,
+        title: this.newTodoText
+      })
+      this.newTodoText = ''
+    }
+  }
+})
+```
+
+{% raw %}
+<div id="todo-list-example" class="demo">
+  <input
+    v-model="newTodoText"
+    v-on:keyup.enter="addNewTodo"
+    placeholder="Add a todo"
+  >
+  <ul>
+    <li
+      is="todo-item"
+      v-for="(todo, index) in todos"
+      v-bind:key="todo.id"
+      v-bind:title="todo.title"
+      v-on:remove="todos.splice(index, 1)"
+    ></li>
+  </ul>
+</div>
+<script>
+Vue.component('todo-item', {
+  template: '\
+    <li>\
+      {{ title }}\
+      <button v-on:click="$emit(\'remove\')">X</button>\
+    </li>\
+  ',
+  props: ['title']
+})
+
+new Vue({
+  el: '#todo-list-example',
+  data: {
+    newTodoText: '',
+    todos: [
+      {
+        id: 1,
+        title: 'Do the dishes',
+      },
+      {
+        id: 2,
+        title: 'Take out the trash',
+      },
+      {
+        id: 3,
+        title: 'Mow the lawn'
+      }
+    ],
+    nextTodoId: 4
+  },
+  methods: {
+    addNewTodo: function () {
+      this.todos.push({
+        id: this.nextTodoId++,
+        title: this.newTodoText
+      })
+      this.newTodoText = ''
+    }
+  }
+})
+</script>
+{% endraw %}
 
 ***
 

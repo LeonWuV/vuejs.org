@@ -3,9 +3,9 @@
 ## Source: https://github.com/tommy351/hexo/
 
 # Site
-title: Vue.js v2.x 中文文档
-subtitle: Vue.js v2.x 中文文档 vuefe.cn
-description: "Vue.js v2.x 中文文档,vuefe.cn,vuefe.com"
+title: Vue.js 中文文档
+subtitle: https://vuefe.cn
+description: "Vue.js 中文文档,vuefe.cn"
 author: Evan You
 email:
 language: zh-CN
@@ -112,10 +112,6 @@ markdown:
 #       handler: networkFirst
 #       options:
 #         origin: ad.doubleclick.net
-#     - urlPattern: /*
-#       handler: networkFirst
-#       options:
-#         origin: srv.carbonads.net
 #     # CDNs - should be cacheFirst, since they should be used specific versions so should not change
 #     - urlPattern: /*
 #       handler: cacheFirst
@@ -140,9 +136,10 @@ markdown:
 
 # Deployment
 ## Docs: http://zespia.tw/hexo/docs/deployment.html
-# deploy:
-#   type: git
-#   repository: git@github.com:vuejs/vuejs.org.git
+deploy:
+  type: git
+  repository: git@github.com:docschina/vuejs.org.git
+  branch: gh-pages
 
 feed:
   type: atom
